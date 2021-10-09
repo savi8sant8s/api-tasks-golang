@@ -13,6 +13,6 @@ func (ur *AppRoute) PrepareAuthRoutes() {
 	publicGroup.POST("/login", authController.Login)
 
 	privateGroup := route.Group("/api/v1/auth")
-	privateGroup.Use(middleware.Auth())
+	privateGroup.Use(new(middleware.AuthMiddleware).Run())
 	privateGroup.POST("/logout", authController.Logout)
 }

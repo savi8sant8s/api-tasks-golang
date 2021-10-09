@@ -24,7 +24,7 @@ func (ac *TaskController) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, "Todas as tarefas")
 }
 
-func (ac *TaskController) UpdateMessage(c *gin.Context) {
+func (ac *TaskController) Update(c *gin.Context) {
 	taskid := c.Query("taskid")
 	body := data.Task{}
 	c.ShouldBindJSON(&body)
