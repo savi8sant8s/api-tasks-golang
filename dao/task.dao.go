@@ -11,8 +11,8 @@ func (td *TaskDao) Create(task entity.Task) entity.Task {
 	return task
 }
 
-func (td *TaskDao) UpdateMessage(userid uint, message string) {
-	db.Model(&entity.Task{}).Where("user_id = ?", userid).Update("message", message)
+func (td *TaskDao) Update(userid uint, task entity.Task) {
+	db.Model(&entity.Task{}).Where("user_id = ?", userid).Update("title", task.Title).Update("message", task.Message)
 }
 
 func (td *TaskDao) Delete(id uint) {

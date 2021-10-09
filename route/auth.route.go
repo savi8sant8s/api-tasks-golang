@@ -2,12 +2,17 @@ package route
 
 import (
 	"savi8sant8s/api/controller"
+	"savi8sant8s/api/middleware"
 )
 
 func (ur *AppRoute) PrepareAuthRoutes() {
 	authController := new(controller.AuthController)
+	
+	publicGroup := route.Group("/api/v1/auth")
+	publicGroup.POST("/register", authController.Register)
+	publicGroup.POST("/login", authController.Login)
 
-	route.POST("/api/v1/auth/register", authController.Register)
-	route.POST("/api/v1/auth/login", authController.Login)
-	route.POST("/api/v1/auth/logout", authController.Logout)
+	privateGroup := route.Group("/api/v1/auth")
+	privateGroup.Use(middleware.Auth())
+	privateGroup.POST("/logout", authController.Logout)
 }
