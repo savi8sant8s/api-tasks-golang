@@ -1,0 +1,6 @@
+https://gorm.io/docs/query.html
+https://golang.org/doc/tutorial/web-service-gin
+https://github.com/gin-gonic/gin#set-and-get-a-cookie
+https://blog.logrocket.com/how-to-build-a-rest-api-with-golang-using-gin-and-gorm/
+https://yourbasic.org/golang/split-string-into-slice/
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
