@@ -16,17 +16,17 @@ type AuthService struct {
 }
 
 func (service *AuthService) ValidToken(token string) (bool, uint) {
-	expired := service.sessionDao.Expired(token)
-	if expired {
-		return true, 0
+	valid := service.sessionDao.Valid(token)
+	if !valid {
+		return false, 0
 	}
-	return false, service.sessionDao.UserID(token)
+	return true, service.sessionDao.UserID(token)
 }
 
 func (service *AuthService) RegisterUser(user entity.User) (int, data.Message) {
 	valid, messageError := service.validation.ValidRegister(user)
 	if !valid {
-		return MakeRes(http.StatusBadRequest,API_REGISTER_INCORRECT_FIELDS, messageError)
+		return MakeRes(http.StatusBadRequest, API_REGISTER_INCORRECT_FIELDS, messageError)
 	} 
 	alreadyExists := service.userDao.Exists(user.Email)
 	if alreadyExists {
@@ -56,4 +56,9 @@ func (service *AuthService) Login(user data.Login) (int, data.Message) {
 	token := GenerateToken(30)
 	service.sessionDao.Create(entity.Session{Expired: false, Token: token, UserID: id})
 	return MakeRes(http.StatusOK, API_LOGIN_SUCCESS, utils.MESSAGE_LOGIN_SUCCESS)
+}
+
+func (this *AuthService) Logout(userToken string) (int, data.Message) {
+	this.sessionDao.Close(userToken)	
+	return MakeRes(http.StatusOK, API_LOGOUT_SUCCESS, utils.MESSAGE_LOGOUT_SUCCESS)
 }

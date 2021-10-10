@@ -7,6 +7,7 @@ const MESSAGE_EMAIL_NOT_REGISTERED = "Não existe usuário cadastrado com esse e
 const MESSAGE_USER_REGISTERED = "Usuário cadastrado com sucesso."
 const MESSAGE_INVALID_CREDENTIALS = "As credenciais informadas estão incorretas."
 const MESSAGE_LOGIN_SUCCESS = "Login realizado com sucesso"
+const MESSAGE_LOGOUT_SUCCESS = "Logout realizado com sucesso"
 
 const MESSAGE_ERROR_NAME = "O nome deve possuir de 3 a 34 letras."
 const MESSAGE_ERROR_EMAIL = "O email deve seguir o padrao fulano@email.com."

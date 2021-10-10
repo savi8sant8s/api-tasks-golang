@@ -17,16 +17,17 @@ type AuthMiddleware struct {
 func (this *AuthMiddleware) Run() gin.HandlerFunc {
     return func (c *gin.Context) {
 		authorizationHeader := c.Request.Header.Get("Authorization")
-		token := strings.Fields(authorizationHeader)
-		
-		if len(token) < 2 {
+		if !strings.Contains(authorizationHeader, "Bearer") {
 			c.AbortWithStatusJSON(service.MakeRes(http.StatusBadRequest, service.API_INCORRECT_AUTH_HEADER, utils.MESSAGE_ERROR_INCORRECT_AUTH_HEADER))
-		} 
-		expired, userId := this.service.ValidToken(token[1])
-		if expired {
-			c.AbortWithStatusJSON(service.MakeRes(http.StatusBadRequest, service.API_INVALID_TOKEN, utils.MESSAGE_ERROR_INVALID_TOKEN))
-		} 
-		c.Request.Header.Add("userId", fmt.Sprintf("%v",userId))
-		c.Next()
+		} else {
+			token := strings.Fields(authorizationHeader)[1]
+			valid, userId := this.service.ValidToken(token)
+			if !valid {
+				c.AbortWithStatusJSON(service.MakeRes(http.StatusBadRequest, service.API_INVALID_TOKEN, utils.MESSAGE_ERROR_INVALID_TOKEN))
+			} 
+			c.Request.Header.Add("UserId", fmt.Sprintf("%v",userId))
+			c.Next()
+		}
+		
     }
 }

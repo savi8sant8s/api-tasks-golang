@@ -6,23 +6,23 @@ import (
 
 type SessionDao struct {}
 
-func (sd *SessionDao) Create(session entity.Session) entity.Session {
+func (this *SessionDao) Create(session entity.Session) entity.Session {
 	db.Select("UserID", "Token", "Expired").Create(&session)
 	return session
 }
 
-func (sd *SessionDao) Close(token string) entity.Session {
-	session := new(entity.Session)
-	db.Model(&session).Where("expired = ?", false).Update("expired", true)
-	return *session
+func (this *SessionDao) Close(token string)bool {
+	db.Model(&entity.Session{}).Where("expired = ?", false).Where("token = ?", token).Update("expired", true)
+	return true
 }
 
-func (sd *SessionDao) Expired(token string) bool {
-	valid := db.Where("token = ?", token).Where("expired = ?", true).Take(&entity.Session{})
-	return valid.RowsAffected > 0
+func (this *SessionDao) Valid(token string) bool {
+	count := int64(0) 
+	db.Take(&entity.Session{}).Where("token = ? AND expired = ?", token, false).Count(&count)
+	return count > 0
 }
 
-func (sd *SessionDao) UserID(token string) uint {
+func (this *SessionDao) UserID(token string) uint {
 	session := new(entity.Session)
 	db.Select("user_id").Where("token = ?", token).Find(&session)
 	return session.UserID
