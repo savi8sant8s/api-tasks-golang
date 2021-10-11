@@ -11,6 +11,7 @@ type AppRoute struct {
 	authController controller.AuthController
 	taskController controller.TaskController
 	authMiddleware middleware.AuthMiddleware
+	taskMiddleware middleware.TaskMiddleware
 }
 
 func (this *AppRoute) PrepareRoutes(){

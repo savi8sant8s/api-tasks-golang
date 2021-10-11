@@ -30,6 +30,6 @@ func (this *TaskDao) Delete(userId uint, id string) {
 
 func (this *TaskDao) FindAllById(userId uint) []entity.Task{
 	var tasks []entity.Task 
-	this.db.Instance().Where("user_id = ?", userId).Find(&tasks)
+	this.db.Instance().Where("user_id = ? AND deleted_at IS NULL", userId).Find(&tasks)
 	return tasks
 }

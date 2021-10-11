@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
+	"savi8sant8s/api/dao"
 	"savi8sant8s/api/data"
-	"savi8sant8s/api/service"
 	"savi8sant8s/api/utils"
 	"strings"
 
@@ -12,7 +11,7 @@ import (
 )
 
 type AuthMiddleware struct {
-	service service.AuthService
+	sessionDao dao.SessionDao
 }
 
 func (this *AuthMiddleware) Run() gin.HandlerFunc {
@@ -25,14 +24,13 @@ func (this *AuthMiddleware) Run() gin.HandlerFunc {
 			})
 		} else {
 			token := strings.Fields(authorizationHeader)[1]
-			valid, userId := this.service.ValidToken(token)
+			valid := this.sessionDao.Valid(token)
 			if !valid {
 				c.AbortWithStatusJSON(http.StatusBadRequest, data.Message {
 					ApiStatus: utils.API_INVALID_TOKEN, 
 					Message: utils.ERROR_INVALID_TOKEN,
 				})
 			}
-			c.Request.Header.Add("UserId", fmt.Sprintf("%v", userId))
 			c.Next()
 		}
 	}

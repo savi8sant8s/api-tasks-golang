@@ -43,13 +43,6 @@ func (this *TaskService) All(userToken string) (int, interface{}) {
 }
 
 func (this *TaskService) Delete(userToken string, taskId string) (int, interface{}) {
-	exists := this.taskDao.Exists(taskId)
-	if !exists {
-		return http.StatusNotFound, data.Message{
-			ApiStatus: utils.API_NOT_FOUND_TASK_SUCCESS,
-			Message: utils.NOT_FOUND_TASK_SUCCESS,
-		}
-	}
 	userId := this.sessionDao.UserID(userToken)
 	this.taskDao.Delete(userId, taskId)
 	return http.StatusOK, data.Message{
@@ -59,13 +52,6 @@ func (this *TaskService) Delete(userToken string, taskId string) (int, interface
 }
 
 func (this *TaskService) Update(userToken string, taskId string, task entity.Task) (int, interface{}) {
-	exists := this.taskDao.Exists(taskId)
-	if !exists {
-		return http.StatusNotFound, data.Message{
-			ApiStatus: utils.API_NOT_FOUND_TASK_SUCCESS,
-			Message: utils.NOT_FOUND_TASK_SUCCESS,
-		}
-	}
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
 		return http.StatusBadRequest, data.Message {

@@ -34,7 +34,7 @@ func (this *TaskController) Delete(c *gin.Context) {
 }
 
 func (this *TaskController) Update(c *gin.Context) {
-	taskId := c.Query("taskid")
+	taskId := c.Query("id")
 	authorizationHeader := c.Request.Header.Get("Authorization")
 	token := strings.Fields(authorizationHeader)[1]
 	body := entity.Task{}

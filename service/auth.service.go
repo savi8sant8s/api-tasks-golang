@@ -14,14 +14,6 @@ type AuthService struct {
 	userDao    dao.UserDao
 }
 
-func (this *AuthService) ValidToken(token string) (bool, uint) {
-	valid := this.sessionDao.Valid(token)
-	if !valid {
-		return false, 0
-	}
-	return true, this.sessionDao.UserID(token)
-}
-
 func (this *AuthService) Register(user entity.User) (int, interface{}) {
 	valid, messageError := validation.ValidUser(user)
 	if !valid {
