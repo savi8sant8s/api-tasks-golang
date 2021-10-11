@@ -1,26 +1,35 @@
 package dao
 
 import (
+	"savi8sant8s/api/database"
 	"savi8sant8s/api/entity"
 )
 
-type TaskDao struct {}
+type TaskDao struct {
+	db database.Database
+}
 
-func (td *TaskDao) Create(task entity.Task) entity.Task {
-	db.Select("UserID", "Title", "Message").Create(&task)
+func (this *TaskDao) Create(task entity.Task) entity.Task {
+	this.db.Instance().Select("UserID", "Title", "Message").Create(&task)
 	return task
 }
 
-func (td *TaskDao) Update(userid uint, task entity.Task) {
-	db.Model(&entity.Task{}).Where("user_id = ?", userid).Update("title", task.Title).Update("message", task.Message)
+func (this *TaskDao) Exists(taskId string) bool {
+	count := int64(0) 
+	this.db.Instance().Take(&entity.Session{}).Where("id = ?", taskId).Count(&count)
+	return count > 0
 }
 
-func (td *TaskDao) Delete(id uint) {
-	db.Delete(&entity.Task{}, id)
+func (this *TaskDao) Update(userId uint, id string, task entity.Task) {
+	this.db.Instance().Model(&entity.Task{}).Where("user_id = ? AND id = ?", userId, id).Update("title", task.Title).Update("message", task.Message)
 }
 
-func (td *TaskDao) FindAllById(id uint) []entity.Task{
-	var user = new(entity.User)
-	db.First(&user, 10)
-	return user.Tasks
+func (this *TaskDao) Delete(userId uint, id string) {
+	this.db.Instance().Where("user_id = ? AND id = ?", userId, id).Delete(&entity.Task{})
+}
+
+func (this *TaskDao) FindAllById(userId uint) []entity.Task{
+	var tasks []entity.Task 
+	this.db.Instance().Where("user_id = ?", userId).Find(&tasks)
+	return tasks
 }

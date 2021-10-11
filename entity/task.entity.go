@@ -6,7 +6,7 @@ import (
 
 type Task struct {
 	gorm.Model
-	UserID uint
-	Title   string
-	Message string
+	UserID uint 
+	Title   string `json:"title"`
+	Message string `json:"message"`
 }

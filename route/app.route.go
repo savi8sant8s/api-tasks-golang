@@ -2,20 +2,26 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
+	"savi8sant8s/api/controller"
+	"savi8sant8s/api/middleware"
 )
 
-type AppRoute struct {}
-
-var route *gin.Engine = gin.New()
-
-func (appRoute *AppRoute) PrepareRoutes(){
-	route.Use(gin.Logger())
-	route.Use(gin.Recovery())
-	
-	appRoute.PrepareAuthRoutes()
-	appRoute.PrepareTaskRoutes()
+type AppRoute struct {
+	route *gin.Engine
+	authController controller.AuthController
+	taskController controller.TaskController
+	authMiddleware middleware.AuthMiddleware
 }
 
-func (appRoute *AppRoute) Run(){
-	route.Run(":8080")
+func (this *AppRoute) PrepareRoutes(){
+	this.route = gin.New()
+	this.route.Use(gin.Logger())
+	this.route.Use(gin.Recovery())
+	
+	this.PrepareAuthRoutes()
+	this.PrepareTaskRoutes()
+}
+
+func (this *AppRoute) Run(){
+	this.route.Run(":8080")
 }

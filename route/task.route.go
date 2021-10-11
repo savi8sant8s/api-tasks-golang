@@ -1,17 +1,10 @@
 package route
 
-import (
-	"savi8sant8s/api/controller"
-	"savi8sant8s/api/middleware"
-)
-
-func (ur *AppRoute) PrepareTaskRoutes() {
-	taskController := new(controller.TaskController)
-
-	privateGroup := route.Group("/api/v1/tasks")
-	privateGroup.Use(new(middleware.AuthMiddleware).Run())
-	privateGroup.GET("", taskController.GetAll)
-	privateGroup.POST("", taskController.New)
-	privateGroup.PATCH("", taskController.Update)
-	privateGroup.DELETE("", taskController.Delete)
+func (this *AppRoute) PrepareTaskRoutes() {
+	privateGroup := this.route.Group("/api/v1/tasks")
+	privateGroup.Use(this.authMiddleware.Run())
+	privateGroup.GET("", this.taskController.All)
+	privateGroup.POST("", this.taskController.Create)
+	privateGroup.PATCH("", this.taskController.Update)
+	privateGroup.DELETE("", this.taskController.Delete)
 }

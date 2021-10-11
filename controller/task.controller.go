@@ -1,33 +1,43 @@
 package controller
 
 import (
-	"net/http"
-	"savi8sant8s/api/data"
+	"savi8sant8s/api/entity"
+	"savi8sant8s/api/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TaskController struct { }
+type TaskController struct {
+	taskService service.TaskService
+}
 
-func (ac *TaskController) New(c *gin.Context) {
-	body := data.Task{}
+func (this *TaskController) Create(c *gin.Context) {
+	authorizationHeader := c.Request.Header.Get("Authorization")
+	token := strings.Fields(authorizationHeader)[1]
+	body := entity.Task{}
 	c.ShouldBindJSON(&body)
-	c.JSON(http.StatusOK, body)
+	c.JSON(this.taskService.Create(token, body))
 }
 
-func (ac *TaskController) Delete(c *gin.Context) {
-	taskid := c.Query("taskid")
-	c.JSON(http.StatusOK, taskid)
+func (this *TaskController) All(c *gin.Context) {
+	authorizationHeader := c.Request.Header.Get("Authorization")
+	token := strings.Fields(authorizationHeader)[1]
+	c.JSON(this.taskService.All(token))
 }
 
-func (ac *TaskController) GetAll(c *gin.Context) {
-	c.JSON(http.StatusOK, "Todas as tarefas")
+func (this *TaskController) Delete(c *gin.Context) {
+	taskId := c.Query("id")
+	authorizationHeader := c.Request.Header.Get("Authorization")
+	token := strings.Fields(authorizationHeader)[1]
+	c.JSON(this.taskService.Delete(token, taskId))
 }
 
-func (ac *TaskController) Update(c *gin.Context) {
-	taskid := c.Query("taskid")
-	body := data.Task{}
+func (this *TaskController) Update(c *gin.Context) {
+	taskId := c.Query("taskid")
+	authorizationHeader := c.Request.Header.Get("Authorization")
+	token := strings.Fields(authorizationHeader)[1]
+	body := entity.Task{}
 	c.ShouldBindJSON(&body)
-	body.Title = body.Title + taskid
-	c.JSON(http.StatusOK, body)
+	c.JSON(this.taskService.Update(token, taskId, body))
 }

@@ -10,55 +10,82 @@ import (
 )
 
 type AuthService struct {
-	validation validation.AuthValidation
 	sessionDao dao.SessionDao
-	userDao dao.UserDao
+	userDao    dao.UserDao
 }
 
-func (service *AuthService) ValidToken(token string) (bool, uint) {
-	valid := service.sessionDao.Valid(token)
+func (this *AuthService) ValidToken(token string) (bool, uint) {
+	valid := this.sessionDao.Valid(token)
 	if !valid {
 		return false, 0
 	}
-	return true, service.sessionDao.UserID(token)
+	return true, this.sessionDao.UserID(token)
 }
 
-func (service *AuthService) RegisterUser(user entity.User) (int, data.Message) {
-	valid, messageError := service.validation.ValidRegister(user)
+func (this *AuthService) Register(user entity.User) (int, interface{}) {
+	valid, messageError := validation.ValidUser(user)
 	if !valid {
-		return MakeRes(http.StatusBadRequest, API_REGISTER_INCORRECT_FIELDS, messageError)
-	} 
-	alreadyExists := service.userDao.Exists(user.Email)
+		return http.StatusBadRequest, data.Message {
+			ApiStatus: utils.API_REGISTER_INCORRECT_FIELDS, 
+			Message: messageError,
+		}
+	}
+	alreadyExists := this.userDao.Exists(user.Email)
 	if alreadyExists {
-		return MakeRes(http.StatusConflict, API_REGISTER_EMAIL_ALREADY_EXISTS, utils.MESSAGE_EMAIL_ALREADY_REGISTERED)
+		return http.StatusConflict, data.Message {
+			ApiStatus: utils.API_REGISTER_EMAIL_ALREADY_EXISTS, 
+			Message: utils.EMAIL_ALREADY_REGISTERED,
+		}
 	}
 	hash, _ := HashPassword(user.Password)
 	user.Password = hash
-	service.userDao.New(user)
-	return MakeRes(http.StatusOK, API_REGISTER_SUCCESS, utils.MESSAGE_USER_REGISTERED)
+	this.userDao.New(user)
+	return http.StatusOK, data.Message {
+		ApiStatus: utils.API_REGISTER_SUCCESS, 
+		Message: utils.USER_REGISTERED,
+	}
 }
 
-func (service *AuthService) Login(user data.Login) (int, data.Message) {
-	valid, messageError := service.validation.ValidLogin(user)
+func (this *AuthService) CreateSession(user data.Login) (int, interface{}) {
+	valid, messageError := validation.ValidLogin(user)
 	if !valid {
-		return MakeRes(http.StatusBadRequest,API_REGISTER_INCORRECT_FIELDS, messageError)
-	} 
-	exists := service.userDao.Exists(user.Email)
-	if !exists {
-		return MakeRes(http.StatusConflict, API_LOGIN_EMAIL_NOT_REGISTERED, utils.MESSAGE_EMAIL_NOT_REGISTERED)
+		return http.StatusBadRequest, data.Message {
+			ApiStatus: utils.API_REGISTER_INCORRECT_FIELDS, 
+			Message: messageError,
+		}
 	}
-	hash := service.userDao.GetHashByEmail(user.Email)
+	exists := this.userDao.Exists(user.Email)
+	if !exists {
+		return http.StatusConflict, data.Message{
+			ApiStatus: utils.API_LOGIN_EMAIL_NOT_REGISTERED, 
+			Message: utils.EMAIL_NOT_REGISTERED,
+		}
+	}
+	hash := this.userDao.GetHashByEmail(user.Email)
 	validPassword := CheckPasswordHash(user.Password, hash)
 	if !validPassword {
-		return MakeRes(http.StatusUnauthorized, API_LOGIN_INVALID_CREDENTIALS, utils.MESSAGE_INVALID_CREDENTIALS)
+		return http.StatusUnauthorized, data.Message {
+			ApiStatus: utils.API_LOGIN_INVALID_CREDENTIALS, 
+			Message: utils.INVALID_CREDENTIALS,
+		}
 	}
-	id := service.userDao.GetIdByEmail(user.Email)
+	id := this.userDao.GetIdByEmail(user.Email)
 	token := GenerateToken(30)
-	service.sessionDao.Create(entity.Session{Expired: false, Token: token, UserID: id})
-	return MakeRes(http.StatusOK, API_LOGIN_SUCCESS, utils.MESSAGE_LOGIN_SUCCESS)
+	this.sessionDao.CloseLastSessions(id)
+	this.sessionDao.Create(entity.Session{Expired: false, Token: token, UserID: id})
+	return http.StatusOK, data.MessageToken {
+		Message: data.Message {
+			ApiStatus: utils.API_LOGIN_SUCCESS, 
+			Message: utils.LOGIN_SUCCESS,
+		},
+		Token: token,
+	}
 }
 
-func (this *AuthService) Logout(userToken string) (int, data.Message) {
-	this.sessionDao.Close(userToken)	
-	return MakeRes(http.StatusOK, API_LOGOUT_SUCCESS, utils.MESSAGE_LOGOUT_SUCCESS)
+func (this *AuthService) CloseSession(userToken string) (int, interface{}) {
+	this.sessionDao.Close(userToken)
+	return http.StatusOK, data.Message {
+		ApiStatus: utils.API_LOGOUT_SUCCESS, 
+		Message: utils.LOGOUT_SUCCESS,
+	}
 }
