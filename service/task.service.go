@@ -14,7 +14,7 @@ type TaskService struct {
 	taskDao dao.TaskDao
 }
 
-func (this *TaskService) Create(userToken string, task entity.Task) (int, interface{}) {
+func (this *TaskService) Create(token string, task entity.Task) (int, interface{}) {
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -22,7 +22,7 @@ func (this *TaskService) Create(userToken string, task entity.Task) (int, interf
 			Message: messageError,
 		}
 	} 
-	task.UserID = this.sessionDao.UserID(userToken)
+	task.UserID = this.sessionDao.GetUserID(token)
 	this.taskDao.Create(task)
 	return http.StatusOK, data.Message {
 		ApiStatus: utils.API_CREATE_TASK_SUCCESS, 
@@ -30,8 +30,8 @@ func (this *TaskService) Create(userToken string, task entity.Task) (int, interf
 	}
 }
 
-func (this *TaskService) All(userToken string) (int, interface{}) {
-	userId := this.sessionDao.UserID(userToken)
+func (this *TaskService) GetAll(token string) (int, interface{}) {
+	userId := this.sessionDao.GetUserID(token)
 	json := data.MessageTasks{
 		Message: data.Message{
 			ApiStatus: utils.API_ALL_TASKS_SUCCESS,
@@ -42,8 +42,8 @@ func (this *TaskService) All(userToken string) (int, interface{}) {
 	return http.StatusOK, json
 }
 
-func (this *TaskService) Delete(userToken string, taskId string) (int, interface{}) {
-	userId := this.sessionDao.UserID(userToken)
+func (this *TaskService) Delete(token string, taskId string) (int, interface{}) {
+	userId := this.sessionDao.GetUserID(token)
 	this.taskDao.Delete(userId, taskId)
 	return http.StatusOK, data.Message{
 		ApiStatus: utils.API_DELETE_TASK_SUCCESS,
@@ -51,7 +51,7 @@ func (this *TaskService) Delete(userToken string, taskId string) (int, interface
 	}
 }
 
-func (this *TaskService) Update(userToken string, taskId string, task entity.Task) (int, interface{}) {
+func (this *TaskService) Update(token string, taskId string, task entity.Task) (int, interface{}) {
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -59,10 +59,11 @@ func (this *TaskService) Update(userToken string, taskId string, task entity.Tas
 			Message: messageError,
 		}
 	} 
-	userId := this.sessionDao.UserID(userToken)
+	userId := this.sessionDao.GetUserID(token)
 	this.taskDao.Update(userId, taskId, task)
 	return http.StatusOK, data.Message {
 		ApiStatus: utils.API_UPDATE_TASK_SUCCESS, 
 		Message: utils.UPDATE_TASK_SUCCESS,
 	}
 }
+

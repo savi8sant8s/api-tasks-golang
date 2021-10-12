@@ -7,11 +7,11 @@ const (
 	EMAIL_NOT_REGISTERED = "Não existe usuário cadastrado com esse email."
 	USER_REGISTERED = "Usuário cadastrado com sucesso."
 	INVALID_CREDENTIALS = "As credenciais informadas estão incorretas."
-	LOGIN_SUCCESS = "Login realizado com sucesso"
+	LOGIN_SUCCESS = "Login realizado com sucesso."
 	LOGOUT_SUCCESS = "Logout realizado com sucesso"
 
 	ERROR_NAME = "O nome deve possuir de 3 a 34 letras."
-	ERROR_EMAIL = "O email deve seguir o padrao fulano@email.com."
+	ERROR_EMAIL = "O email deve seguir o padrão fulano@email.com."
 	ERROR_PASSWORD = "A senha deve possuir de 8 a 32 caracteres."
 	ERROR_INCORRECT_AUTH_HEADER = "Token não especificado corretamente."
 	ERROR_INVALID_TOKEN = "Token inválido ou sessão expirada."

@@ -2,7 +2,6 @@ package validation
 
 import (
 	"regexp"
-	"savi8sant8s/api/data"
 	"savi8sant8s/api/entity"
 	"savi8sant8s/api/utils"
 )
@@ -23,7 +22,7 @@ func ValidUser(user entity.User) (bool, string) {
 	return true, utils.BLANK
 }
 
-func ValidLogin(user data.Login) (bool, string) {
+func ValidLogin(user entity.User) (bool, string) {
 	matchEmail, _ := regexp.MatchString(REGEX_EMAIL, user.Email)
 	if !matchEmail {
 		return false, utils.ERROR_EMAIL

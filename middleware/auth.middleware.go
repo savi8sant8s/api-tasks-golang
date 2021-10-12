@@ -24,7 +24,7 @@ func (this *AuthMiddleware) Run() gin.HandlerFunc {
 			})
 		} else {
 			token := strings.Fields(authorizationHeader)[1]
-			valid := this.sessionDao.Valid(token)
+			valid := this.sessionDao.ValidToken(token)
 			if !valid {
 				c.AbortWithStatusJSON(http.StatusBadRequest, data.Message {
 					ApiStatus: utils.API_INVALID_TOKEN, 

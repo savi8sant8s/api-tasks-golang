@@ -14,7 +14,7 @@ type AuthService struct {
 	userDao    dao.UserDao
 }
 
-func (this *AuthService) Register(user entity.User) (int, interface{}) {
+func (this *AuthService) RegisterUser(user entity.User) (int, interface{}) {
 	valid, messageError := validation.ValidUser(user)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -38,7 +38,7 @@ func (this *AuthService) Register(user entity.User) (int, interface{}) {
 	}
 }
 
-func (this *AuthService) CreateSession(user data.Login) (int, interface{}) {
+func (this *AuthService) CreateSession(user entity.User) (int, interface{}) {
 	valid, messageError := validation.ValidLogin(user)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -64,7 +64,7 @@ func (this *AuthService) CreateSession(user data.Login) (int, interface{}) {
 	id := this.userDao.GetIdByEmail(user.Email)
 	token := GenerateToken(30)
 	this.sessionDao.CloseLastSessions(id)
-	this.sessionDao.Create(entity.Session{Expired: false, Token: token, UserID: id})
+	this.sessionDao.CreateSession(entity.Session{Expired: false, Token: token, UserID: id})
 	return http.StatusOK, data.MessageToken {
 		Message: data.Message {
 			ApiStatus: utils.API_LOGIN_SUCCESS, 
@@ -74,8 +74,8 @@ func (this *AuthService) CreateSession(user data.Login) (int, interface{}) {
 	}
 }
 
-func (this *AuthService) CloseSession(userToken string) (int, interface{}) {
-	this.sessionDao.Close(userToken)
+func (this *AuthService) CloseSession(token string) (int, interface{}) {
+	this.sessionDao.CloseSession(token)
 	return http.StatusOK, data.Message {
 		ApiStatus: utils.API_LOGOUT_SUCCESS, 
 		Message: utils.LOGOUT_SUCCESS,

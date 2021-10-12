@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"savi8sant8s/api/data"
 	"savi8sant8s/api/entity"
 	"savi8sant8s/api/service"
 	"strings"
@@ -16,11 +15,11 @@ type AuthController struct {
 func (this *AuthController) DoRegister(c *gin.Context) {
 	body := entity.User{}
 	c.ShouldBindJSON(&body)
-	c.JSON(this.authService.Register(body))
+	c.JSON(this.authService.RegisterUser(body))
 }
 
 func (this *AuthController) DoLogin(c *gin.Context) {
-	body := data.Login{}
+	body := entity.User{}
 	c.ShouldBindJSON(&body)
 	c.JSON(this.authService.CreateSession(body))
 }
