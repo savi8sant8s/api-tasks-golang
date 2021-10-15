@@ -4,34 +4,36 @@ import (
 	"net/http"
 	"savi8sant8s/api/dao"
 	"savi8sant8s/api/data"
+	"savi8sant8s/api/service"
 	"savi8sant8s/api/utils"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 )
 
 type AuthMiddleware struct {
-	sessionDao dao.SessionDao
-}
+	jwtService service.JwtService
+	userDao dao.UserDao
+ }
 
 func (this *AuthMiddleware) Run() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authorizationHeader := c.Request.Header.Get("Authorization")
-		if !strings.Contains(authorizationHeader, "Bearer") {
+		token, err := service.GetTokenFromBearerAuth(c)
+		if err {
 			c.AbortWithStatusJSON(http.StatusBadRequest, data.Message {
 				ApiStatus: utils.API_INCORRECT_AUTH_HEADER, 
 				Message: utils.ERROR_INCORRECT_AUTH_HEADER,
 			})
 		} else {
-			token := strings.Fields(authorizationHeader)[1]
-			valid := this.sessionDao.ValidToken(token)
-			if !valid {
+			valid, userEmail := this.jwtService.VerifyToken(token)
+			user := this.userDao.GetUserByEmail(userEmail)
+			if valid {
+				c.Set("userId", user.ID)
+				c.Next()
+			} else {
 				c.AbortWithStatusJSON(http.StatusBadRequest, data.Message {
 					ApiStatus: utils.API_INVALID_TOKEN, 
 					Message: utils.ERROR_INVALID_TOKEN,
 				})
-			}
-			c.Next()
-		}
+			}	
+		} 
 	}
 }

@@ -10,11 +10,10 @@ import (
 )
 
 type TaskService struct {
-	sessionDao dao.SessionDao
 	taskDao dao.TaskDao
 }
 
-func (this *TaskService) Create(token string, task entity.Task) (int, interface{}) {
+func (this *TaskService) CreateTask(task entity.Task) (int, interface{}) {
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -22,7 +21,6 @@ func (this *TaskService) Create(token string, task entity.Task) (int, interface{
 			Message: messageError,
 		}
 	} 
-	task.UserID = this.sessionDao.GetUserID(token)
 	this.taskDao.Create(task)
 	return http.StatusOK, data.Message {
 		ApiStatus: utils.API_CREATE_TASK_SUCCESS, 
@@ -30,8 +28,7 @@ func (this *TaskService) Create(token string, task entity.Task) (int, interface{
 	}
 }
 
-func (this *TaskService) GetAll(token string) (int, interface{}) {
-	userId := this.sessionDao.GetUserID(token)
+func (this *TaskService) GetAllTasks(userId uint) (int, interface{}) {
 	json := data.MessageTasks{
 		Message: data.Message{
 			ApiStatus: utils.API_ALL_TASKS_SUCCESS,
@@ -42,16 +39,15 @@ func (this *TaskService) GetAll(token string) (int, interface{}) {
 	return http.StatusOK, json
 }
 
-func (this *TaskService) Delete(token string, taskId string) (int, interface{}) {
-	userId := this.sessionDao.GetUserID(token)
-	this.taskDao.Delete(userId, taskId)
+func (this *TaskService) DeleteTask(taskId uint) (int, interface{}) {
+	this.taskDao.Delete(taskId)
 	return http.StatusOK, data.Message{
 		ApiStatus: utils.API_DELETE_TASK_SUCCESS,
 		Message: utils.DELETE_TASK_SUCCESS,
 	}
 }
 
-func (this *TaskService) Update(token string, taskId string, task entity.Task) (int, interface{}) {
+func (this *TaskService) UpdateTask(task entity.Task) (int, interface{}) {
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
 		return http.StatusBadRequest, data.Message {
@@ -59,8 +55,7 @@ func (this *TaskService) Update(token string, taskId string, task entity.Task) (
 			Message: messageError,
 		}
 	} 
-	userId := this.sessionDao.GetUserID(token)
-	this.taskDao.Update(userId, taskId, task)
+	this.taskDao.Update(task)
 	return http.StatusOK, data.Message {
 		ApiStatus: utils.API_UPDATE_TASK_SUCCESS, 
 		Message: utils.UPDATE_TASK_SUCCESS,

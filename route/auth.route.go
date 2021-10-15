@@ -7,5 +7,4 @@ func (this *App) PrepareAuthRoutes() {
 
 	privateGroup := this.app.Group("/api/v1/auth")
 	privateGroup.Use(this.authMiddleware.Run())
-	privateGroup.POST("/logout", this.authController.DoLogout)
 }

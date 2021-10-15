@@ -6,6 +6,6 @@ func (this *App) PrepareTaskRoutes() {
 	privateGroup.GET("", this.taskController.DoGet)
 	privateGroup.POST("", this.taskController.DoCreate)
 	privateGroup.Use(this.taskMiddleware.Run())
-	privateGroup.PATCH("", this.taskController.DoUpdate)
-	privateGroup.DELETE("", this.taskController.DoDelete)
+	privateGroup.PATCH("/:taskId", this.taskController.DoUpdate)
+	privateGroup.DELETE("/:taskId", this.taskController.DoDelete)
 }

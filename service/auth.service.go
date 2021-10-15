@@ -10,8 +10,8 @@ import (
 )
 
 type AuthService struct {
-	sessionDao dao.SessionDao
 	userDao    dao.UserDao
+	jwtService JwtService
 }
 
 func (this *AuthService) RegisterUser(user entity.User) (int, interface{}) {
@@ -29,7 +29,7 @@ func (this *AuthService) RegisterUser(user entity.User) (int, interface{}) {
 			Message: utils.EMAIL_ALREADY_REGISTERED,
 		}
 	}
-	hash, _ := HashPassword(user.Password)
+	hash := EncryptPassword(user.Password)
 	user.Password = hash
 	this.userDao.New(user)
 	return http.StatusOK, data.Message {
@@ -53,18 +53,14 @@ func (this *AuthService) CreateSession(user entity.User) (int, interface{}) {
 			Message: utils.EMAIL_NOT_REGISTERED,
 		}
 	}
-	hash := this.userDao.GetHashByEmail(user.Email)
-	validPassword := CheckPasswordHash(user.Password, hash)
-	if !validPassword {
+	userDb := this.userDao.GetUserByEmail(user.Email)
+	if !ValidPassword(user.Password, userDb.Password) {
 		return http.StatusUnauthorized, data.Message {
 			ApiStatus: utils.API_LOGIN_INVALID_CREDENTIALS, 
 			Message: utils.INVALID_CREDENTIALS,
 		}
 	}
-	id := this.userDao.GetIdByEmail(user.Email)
-	token := GenerateToken(30)
-	this.sessionDao.CloseLastSessions(id)
-	this.sessionDao.CreateSession(entity.Session{Expired: false, Token: token, UserID: id})
+	token := this.jwtService.CreateToken(user.Email)
 	return http.StatusOK, data.MessageToken {
 		Message: data.Message {
 			ApiStatus: utils.API_LOGIN_SUCCESS, 
@@ -74,10 +70,3 @@ func (this *AuthService) CreateSession(user entity.User) (int, interface{}) {
 	}
 }
 
-func (this *AuthService) CloseSession(token string) (int, interface{}) {
-	this.sessionDao.CloseSession(token)
-	return http.StatusOK, data.Message {
-		ApiStatus: utils.API_LOGOUT_SUCCESS, 
-		Message: utils.LOGOUT_SUCCESS,
-	}
-}

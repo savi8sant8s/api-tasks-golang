@@ -10,7 +10,7 @@ type UserDao struct {
 }
 
 func (this *UserDao) New(user entity.User) entity.User {
-	this.db.Instance().Select("Name", "Email", "Password").Create(&user)
+	this.db.Instance().Select("name", "email", "password").Create(&user)
 	return user
 }
 
@@ -19,14 +19,8 @@ func (this *UserDao) Exists(email string) bool {
 	return valid.RowsAffected > 0
 }
 
-func (this *UserDao) GetHashByEmail(email string) string {
-	user := new(entity.User)
-	this.db.Instance().Where("email = ?", email).Select("password").Find(&user)
-	return user.Password
-}
-
-func (this *UserDao) GetIdByEmail(email string) uint {
-	user := new(entity.User)
-	this.db.Instance().Where("email = ?", email).Select("id").Find(&user)
-	return user.ID
+func (this *UserDao) GetUserByEmail(email string) entity.User {
+	var user entity.User
+	this.db.Instance().Where("email = ?", email).Find(&user)
+	return user
 }

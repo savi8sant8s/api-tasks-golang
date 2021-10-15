@@ -5,7 +5,6 @@ import (
 	"os"
 	"savi8sant8s/api/controller"
 	"savi8sant8s/api/middleware"
-
 	"github.com/gin-gonic/gin"
 )
 

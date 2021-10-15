@@ -5,7 +5,7 @@ import (
 	"savi8sant8s/api/dao"
 	"savi8sant8s/api/data"
 	"savi8sant8s/api/utils"
-
+	"strconv"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,8 +15,9 @@ type TaskMiddleware struct {
 
 func (this *TaskMiddleware) Run() gin.HandlerFunc {
 	return func(c *gin.Context) {
-			taskId := c.Query("id")
-			exists := this.taskDao.Exists(taskId)
+			taskId, _ := strconv.ParseUint(c.Param("taskId"), 10, 64)
+			exists := this.taskDao.Exists(uint(taskId))
+			c.Set("taskId", uint(taskId))
 			if !exists {
 				c.AbortWithStatusJSON(http.StatusNotFound, data.Message{
 					ApiStatus: utils.API_NOT_FOUND_TASK,

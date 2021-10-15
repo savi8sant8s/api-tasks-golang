@@ -3,8 +3,6 @@ package controller
 import (
 	"savi8sant8s/api/entity"
 	"savi8sant8s/api/service"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,8 +22,3 @@ func (this *AuthController) DoLogin(c *gin.Context) {
 	c.JSON(this.authService.CreateSession(body))
 }
 
-func (this *AuthController) DoLogout(c *gin.Context) {
-	authorizationHeader := c.Request.Header.Get("Authorization")
-	token := strings.Fields(authorizationHeader)[1]
-	c.JSON(this.authService.CloseSession(token))
-}
