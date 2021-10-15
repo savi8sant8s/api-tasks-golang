@@ -1,6 +1,6 @@
 package data
 
-import "savi8sant8s/api/entity"
+import "savi8sant8s/gotasks/entity"
 
 type MessageTasks struct {
 	Message

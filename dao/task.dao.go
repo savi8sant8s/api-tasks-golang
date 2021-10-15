@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"savi8sant8s/api/database"
-	"savi8sant8s/api/entity"
+	"savi8sant8s/gotasks/database"
+	"savi8sant8s/gotasks/entity"
 )
 
 type TaskDao struct {
@@ -14,7 +14,7 @@ func (this *TaskDao) Create(task entity.Task) {
 }
 
 func (this *TaskDao) Exists(taskId uint) bool {
-	count := int64(0) 
+	count := int64(0)
 	this.db.Instance().Take(&entity.Task{}).Where("id = ?", taskId).Count(&count)
 	return count > 0
 }
@@ -27,9 +27,8 @@ func (this *TaskDao) Delete(taskId uint) {
 	this.db.Instance().Where("id = ? ", taskId).Delete(&entity.Task{})
 }
 
-func (this *TaskDao) FindAllById(userId uint) []entity.Task{
-	var tasks []entity.Task 
+func (this *TaskDao) FindAllById(userId uint) []entity.Task {
+	var tasks []entity.Task
 	this.db.Instance().Where("user_id = ? AND deleted_at IS NULL", userId).Find(&tasks)
 	return tasks
 }
-

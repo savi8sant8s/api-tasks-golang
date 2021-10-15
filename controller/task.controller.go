@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"savi8sant8s/api/entity"
-	"savi8sant8s/api/service"
+	"savi8sant8s/gotasks/entity"
+	"savi8sant8s/gotasks/service"
+
 	"github.com/gin-gonic/gin"
 )
 

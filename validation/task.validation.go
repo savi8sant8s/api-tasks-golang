@@ -2,8 +2,8 @@ package validation
 
 import (
 	"regexp"
-	"savi8sant8s/api/entity"
-	"savi8sant8s/api/utils"
+	"savi8sant8s/gotasks/entity"
+	"savi8sant8s/gotasks/utils"
 )
 
 func ValidTask(task entity.Task) (bool, string) {

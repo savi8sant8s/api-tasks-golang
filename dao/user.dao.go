@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"savi8sant8s/api/database"
-	"savi8sant8s/api/entity"
+	"savi8sant8s/gotasks/database"
+	"savi8sant8s/gotasks/entity"
 )
 
 type UserDao struct {
