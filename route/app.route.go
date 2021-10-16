@@ -38,6 +38,7 @@ func (this *App) Prepare() {
 	this.PrepareTaskRoutes()
 }
 
-func (this *App) Run() {
-	this.app.Run(":8080")
+func (this *App) Run(port string) {
+	this.Prepare()
+	this.app.Run(port)
 }

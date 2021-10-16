@@ -7,57 +7,62 @@ import (
 	"savi8sant8s/gotasks/entity"
 	"savi8sant8s/gotasks/utils"
 	"savi8sant8s/gotasks/validation"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TaskService struct {
 	taskDao dao.TaskDao
 }
 
-func (this *TaskService) CreateTask(task entity.Task) (int, interface{}) {
-	valid, messageError := validation.ValidTask(task)
-	if !valid {
-		return http.StatusBadRequest, data.Message{
-			ApiStatus: utils.API_CREATE_TASK_INCORRECT_FIELDS,
-			Message:   messageError,
-		}
-	}
-	this.taskDao.Create(task)
-	return http.StatusOK, data.Message{
-		ApiStatus: utils.API_CREATE_TASK_SUCCESS,
-		Message:   utils.CREATE_TASK_SUCCESS,
+func (this *TaskService) CreateTask(c *gin.Context, task entity.Task) {
+	valid := this.ValidTaskBody(c, task)
+	if valid {
+		this.taskDao.Create(task)
+		c.JSON(http.StatusOK, data.Message{
+			ApiStatus: utils.API_CREATE_TASK_SUCCESS,
+			Message:   utils.CREATE_TASK_SUCCESS,
+		})
 	}
 }
 
-func (this *TaskService) GetAllTasks(userId uint) (int, interface{}) {
-	json := data.MessageTasks{
+func (this *TaskService) GetAllTasks(c *gin.Context, userId uint) {
+	c.JSON(http.StatusOK, data.MessageTasks{
 		Message: data.Message{
 			ApiStatus: utils.API_ALL_TASKS_SUCCESS,
 			Message:   utils.ALL_TASKS_SUCCESS,
 		},
 		Tasks: this.taskDao.FindAllById(userId),
-	}
-	return http.StatusOK, json
+	})
 }
 
-func (this *TaskService) DeleteTask(taskId uint) (int, interface{}) {
+func (this *TaskService) DeleteTask(c *gin.Context, taskId uint) {
 	this.taskDao.Delete(taskId)
-	return http.StatusOK, data.Message{
+	c.JSON(http.StatusOK, data.Message{
 		ApiStatus: utils.API_DELETE_TASK_SUCCESS,
 		Message:   utils.DELETE_TASK_SUCCESS,
-	}
+	})
 }
 
-func (this *TaskService) UpdateTask(task entity.Task) (int, interface{}) {
+func (this *TaskService) UpdateTask(c *gin.Context, task entity.Task) {
+	valid := this.ValidTaskBody(c, task)
+	if valid {
+		this.taskDao.Update(task)
+		c.JSON(http.StatusOK, data.Message{
+			ApiStatus: utils.API_UPDATE_TASK_SUCCESS,
+			Message:   utils.UPDATE_TASK_SUCCESS,
+		})
+	}	
+}
+
+func (this *TaskService) ValidTaskBody(c *gin.Context, task entity.Task) bool {
 	valid, messageError := validation.ValidTask(task)
 	if !valid {
-		return http.StatusBadRequest, data.Message{
-			ApiStatus: utils.API_UPDATE_TASK_INCORRECT_FIELDS,
+		c.JSON(http.StatusBadRequest, data.Message{
+			ApiStatus: utils.API_TASK_INCORRECT_FIELDS,
 			Message:   messageError,
-		}
+		})
+		return false
 	}
-	this.taskDao.Update(task)
-	return http.StatusOK, data.Message{
-		ApiStatus: utils.API_UPDATE_TASK_SUCCESS,
-		Message:   utils.UPDATE_TASK_SUCCESS,
-	}
+	return true
 }

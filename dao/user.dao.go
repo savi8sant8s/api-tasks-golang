@@ -9,7 +9,7 @@ type UserDao struct {
 	db database.Database
 }
 
-func (this *UserDao) New(user entity.User) entity.User {
+func (this *UserDao) Create(user entity.User) entity.User {
 	this.db.Instance().Select("name", "email", "password").Create(&user)
 	return user
 }
@@ -19,7 +19,7 @@ func (this *UserDao) Exists(email string) bool {
 	return valid.RowsAffected > 0
 }
 
-func (this *UserDao) GetUserByEmail(email string) entity.User {
+func (this *UserDao) FindUserByEmail(email string) entity.User {
 	var user entity.User
 	this.db.Instance().Where("email = ?", email).Find(&user)
 	return user

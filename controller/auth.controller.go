@@ -14,11 +14,11 @@ type AuthController struct {
 func (this *AuthController) DoRegister(c *gin.Context) {
 	body := entity.User{}
 	c.ShouldBindJSON(&body)
-	c.JSON(this.authService.RegisterUser(body))
+	this.authService.RegisterUser(c, body)
 }
 
 func (this *AuthController) DoLogin(c *gin.Context) {
 	body := entity.User{}
 	c.ShouldBindJSON(&body)
-	c.JSON(this.authService.CreateSession(body))
+	this.authService.CreateSession(c, body)
 }

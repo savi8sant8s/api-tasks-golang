@@ -25,7 +25,7 @@ func (this *AuthMiddleware) Run() gin.HandlerFunc {
 			})
 		} else {
 			valid, userEmail := this.jwtService.VerifyToken(token)
-			user := this.userDao.GetUserByEmail(userEmail)
+			user := this.userDao.FindUserByEmail(userEmail)
 			if valid {
 				c.Set("userId", user.ID)
 				c.Next()
