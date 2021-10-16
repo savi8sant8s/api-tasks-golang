@@ -102,3 +102,15 @@ func (this *AuthService) ValidUserPassword(c *gin.Context, email string, passwor
 	}
 	return true
 }
+
+func (this *AuthService) ValiTokenHeader(c *gin.Context) (string, bool) {
+	token, err := GetTokenFromBearerAuth(c)
+	if err {
+		return "", false
+	}
+	c.JSON(http.StatusBadRequest, data.Message{
+		ApiStatus: utils.API_INCORRECT_AUTH_HEADER,
+		Message:   utils.ERROR_INCORRECT_AUTH_HEADER,
+	})
+	return token, true
+}

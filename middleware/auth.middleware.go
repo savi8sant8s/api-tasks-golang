@@ -12,25 +12,21 @@ import (
 
 type AuthMiddleware struct {
 	jwtService service.JwtService
-	userDao    dao.UserDao
+	authService    service.AuthService
+	userDao dao.UserDao
 }
 
 func (this *AuthMiddleware) Run() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := service.GetTokenFromBearerAuth(c)
-		if err {
-			c.AbortWithStatusJSON(http.StatusBadRequest, data.Message{
-				ApiStatus: utils.API_INCORRECT_AUTH_HEADER,
-				Message:   utils.ERROR_INCORRECT_AUTH_HEADER,
-			})
-		} else {
+		token, valid := this.authService.ValiTokenHeader(c)
+		if valid {
 			valid, userEmail := this.jwtService.VerifyToken(token)
 			user := this.userDao.FindUserByEmail(userEmail)
 			if valid {
 				c.Set("userId", user.ID)
 				c.Next()
 			} else {
-				c.AbortWithStatusJSON(http.StatusBadRequest, data.Message{
+				c.JSON(http.StatusBadRequest, data.Message{
 					ApiStatus: utils.API_INVALID_TOKEN,
 					Message:   utils.ERROR_INVALID_TOKEN,
 				})

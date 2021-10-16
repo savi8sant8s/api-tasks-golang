@@ -7,6 +7,7 @@ import (
 	"savi8sant8s/gotasks/entity"
 	"savi8sant8s/gotasks/utils"
 	"savi8sant8s/gotasks/validation"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,4 +66,18 @@ func (this *TaskService) ValidTaskBody(c *gin.Context, task entity.Task) bool {
 		return false
 	}
 	return true
+}
+
+func (this *TaskService) TaskExists(c *gin.Context) bool {
+	taskId, _ := strconv.ParseUint(c.Param("taskId"), 10, 64)
+	exists := this.taskDao.Exists(uint(taskId))
+	c.Set("taskId", uint(taskId))
+	if exists {
+		return true
+	} 
+	c.JSON(http.StatusNotFound, data.Message{
+		ApiStatus: utils.API_NOT_FOUND_TASK,
+		Message:   utils.NOT_FOUND_TASK_SUCCESS,
+	})
+	return false
 }
